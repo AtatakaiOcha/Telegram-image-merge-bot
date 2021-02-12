@@ -141,31 +141,26 @@ def download_image(message):
 
 def file_user_id(user_id, crd):
     data = {user_id: crd}
-    try:
+    if os.access(file, os.W_OK):
         with open(file, "a") as out:
             for key, value in zip(data.keys(), data.values()):
-                # out.write("%s:%s-%s-%s\n" % (key, value[0], value[1], value[2]))
                 out.write(f"{key}:{value[0]}-{value[1]}-{value[2]}\n")
                 out.close()
-    except IOError as e:
-        bot.send_message(user_id, f"Exception:{e.__class__.__name__}", timeout=config.READ_TIMEOUT)
 
 
 def file_overwrite_user_data(user_id, crd):
     crd_old = file_read_user_data(user_id)
     crd_old = crd_old.get(user_id)
-    try:
+    if os.access(file, os.W_OK):
         for line in fileinput.input(file, inplace=True):
             if f"{user_id}:{crd_old[0]}-{crd_old[1]}-{crd_old[2]}" in line:
                 line = line.replace(f"{user_id}:{crd_old[0]}-{crd_old[1]}-{crd_old[2]}",
                                     f"{user_id}:{crd[0]}-{crd[1]}-{crd[2]}")
             sys.stdout.write(line)
-    except IOError as e:
-        bot.send_message(user_id, f"Exception:{e.__class__.__name__}", timeout=config.READ_TIMEOUT)
 
 
 def file_read_user_data(user_id):
-    try:
+    if os.access(file, os.R_OK):
         with open(file) as text:
             for line in text:
                 if str(user_id) in line:
@@ -177,8 +172,6 @@ def file_read_user_data(user_id):
                     value[2] = int(value[2].replace("\n", ""))
                     data = {key: value}
                     return data
-    except IOError as e:
-        bot.send_message(user_id, f"Exception:{e.__class__.__name__}", timeout=config.READ_TIMEOUT)
 
 
 if __name__ == '__main__':
